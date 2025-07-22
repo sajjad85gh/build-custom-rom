@@ -1,5 +1,4 @@
 #!/bin/bash
-crave run --no-patch -- "
 repo init -u https://github.com/LMODroid/manifest.git -b fifteen-qpr1 --git-lfs -g default,-mips,-darwin,-notdefault && \
 /opt/crave/resync.sh && \
 rm -rf {device,vendor,kernel}/daria; \
@@ -10,4 +9,4 @@ git clone https://github.com/sajjad85gh/device_daria_zahedan -b lmo6 device/dari
 git clone https://github.com/LineageOS/android_hardware_mediatek -b lineage-22.1 hardware/mediatek && \
 git clone https://github.com/DariaRnD/kernel_daria_mt6877 kernel/daria/mt6877 && \
 . build/envsetup.sh && \
-brunch zahedan"
+brunch zahedan
