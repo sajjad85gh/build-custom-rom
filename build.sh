@@ -1,3 +1,4 @@
+#!/bin/bash
 crave run --no-patch -- "
 repo init -u https://github.com/LMODroid/manifest.git -b fifteen-qpr1 --git-lfs -g default,-mips,-darwin,-notdefault && \
 /opt/crave/resync.sh && \
