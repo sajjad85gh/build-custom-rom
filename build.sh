@@ -10,4 +10,4 @@ git clone https://github.com/sajjad85gh/device_daria_zahedan -b lmo6 device/dari
 git clone https://github.com/LineageOS/android_hardware_mediatek -b lineage-22.1 hardware/mediatek && \
 git clone https://github.com/DariaRnD/kernel_daria_mt6877 kernel/daria/mt6877 && \
 . build/envsetup.sh && \
-brunch zahedan
+brunch zahedan"
