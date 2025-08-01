@@ -1,5 +1,5 @@
 #!/bin/bash
-repo init --no-repo-verify --git-lfs -u https://github.com/ProjectInfinity-X/manifest -b 15-QPR1 -g default,-mips,-darwin,-notdefault && \
+repo init --no-repo-verify --git-lfs -u https://github.com/ProjectInfinity-X/manifest -b 15-QPR0 -g default,-mips,-darwin,-notdefault && \
 /opt/crave/resync.sh && \
 rm -rf {device,vendor,kernel}/daria; \
 rm -rf device/mediatek/sepolicy_vndr hardware/mediatek; \
