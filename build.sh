@@ -9,5 +9,4 @@ git clone https://github.com/sajjad85gh/device_daria_zahedan -b infinity15 devic
 git clone https://github.com/LineageOS/android_hardware_mediatek -b lineage-22.0 hardware/mediatek && \
 git clone https://github.com/DariaRnD/kernel_daria_mt6877 kernel/daria/mt6877 && \
 . build/envsetup.sh && \
-lunch infinity_zahedan-user
-mka bacon
+brunch zahedan
