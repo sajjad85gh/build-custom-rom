@@ -10,4 +10,5 @@ repo init --no-repo-verify --git-lfs -u https://github.com/ProjectInfinity-X/man
 #git clone https://github.com/sajjad85gh/kernel-volla-mt6877 kernel/daria/mt6877 --depth 1 && \
 . build/envsetup.sh && \
 lunch infinity_zahedan-user
-make bacon
+make installclean
+m bacon
