@@ -9,4 +9,6 @@ git clone https://github.com/sajjad85gh/device_daria_zahedan -b cr16.0 device/da
 git clone https://github.com/LineageOS/android_hardware_mediatek -b lineage-22.2 hardware/mediatek && \
 git clone https://github.com/sajjad85gh/kernel-volla-mt6877 kernel/daria/mt6877 && \
 . build/envsetup.sh && \
-brunch zahedan
+breakfast zahedan user && \
+make installclean && \
+mka bacon
