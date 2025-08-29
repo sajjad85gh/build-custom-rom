@@ -1,4 +1,5 @@
 #!/bin/bash
+rm -rf .repo/local_manifests
 repo init -u https://github.com/crdroidandroid/android.git -b 16.0 --git-lfs --no-clone-bundle && \
 /opt/crave/resync.sh && \
 rm -rf {device,vendor,kernel}/daria; \
