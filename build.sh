@@ -10,5 +10,5 @@ git clone https://github.com/daria-community/device_daria_zahedan -b lineage-22.
 git clone https://github.com/LineageOS/android_hardware_mediatek -b lineage-22.2 hardware/mediatek && \
 git clone https://github.com/sajjad85gh/kernel-volla-mt6877 kernel/daria/mt6877 && \
 . build/envsetup.sh && \
-breakfast lineage zahedan userdebug && \
+breakfast zahedan userdebug && \
 mka bakon
