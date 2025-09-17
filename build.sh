@@ -15,4 +15,4 @@ git clone https://github.com/LineageOS/android_hardware_mediatek -b lineage-22.2
 git clone https://github.com/sajjad85gh/kernel-volla-mt6877 kernel/daria/mt6877 && \
 . build/envsetup.sh && \
 lunch lineage_zahedan-bp1a-userdebug && \
-mka bakon
+mka bacon
