@@ -3,8 +3,8 @@ rm -rf .repo/local_manifests
 repo init -u https://github.com/LineageOS/android.git -b lineage-22.2 --git-lfs --no-clone-bundle && \
 /opt/crave/resync.sh && \
 cd build/soong && \
-wget -O https://bashupload.com/7oGX5/LIler.patch && \
-git am LIler.patch && \
+wget -O 0001-soong-HACK-disable-soong_filesystem_creator.patch https://raw.githubusercontent.com/sajjad85gh/build-custom-rom/main/0001-soong-HACK-disable-soong_filesystem_creator.patch && \
+git am 0001-soong-HACK-disable-soong_filesystem_creator.patch && \
 cd - && \
 rm -rf {device,vendor,kernel}/daria; \
 rm -rf {device,hardware}/mediatek; \
