@@ -1,0 +1,23 @@
+From c439a3695d3c9e3b319bf43c97e5499a55dec861 Mon Sep 17 00:00:00 2001
+From: Mohammad Hasan Keramat J <ikeramat@libremobileos.com>
+Date: Wed, 17 Sep 2025 10:02:50 +0330
+Subject: [PATCH] soong: HACK: disable soong_filesystem_creator
+
+Change-Id: I8e9e070453b420384288e035a60ba1df532940ca
+---
+ fsgen/Android.bp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/fsgen/Android.bp b/fsgen/Android.bp
+index 365d9540f..9ff7d8953 100644
+--- a/fsgen/Android.bp
++++ b/fsgen/Android.bp
+@@ -30,4 +30,5 @@ bootstrap_go_package {
+ 
+ soong_filesystem_creator {
+     name: "soong_filesystem_creator",
++    enabled: false,
+ }
+-- 
+2.50.1
+
