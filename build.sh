@@ -5,7 +5,7 @@ repo init -u https://github.com/LineageOS/android.git -b lineage-22.2 --git-lfs 
 cd build/soong && \
 wget -O https://bashupload.com/7oGX5/LIler.patch && \
 git am LIler.patch && \
-cd .. && \
+cd - && \
 rm -rf {device,vendor,kernel}/daria; \
 rm -rf {device,hardware}/mediatek; \
 git clone https://github.com/LineageOS/android_device_mediatek_sepolicy_vndr -b lineage-22.2 device/mediatek/sepolicy_vndr && \
