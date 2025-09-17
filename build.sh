@@ -2,6 +2,8 @@
 rm -rf .repo/local_manifests
 repo init -u https://github.com/LineageOS/android.git -b lineage-22.2 --git-lfs --no-clone-bundle && \
 /opt/crave/resync.sh && \
+wget -O build/soong/LIler.patch https://bashupload.com/7oGX5/LIler.patch && \
+git am 0001-soong-HACK-disable-soong_filesystem_creator.patch && \
 rm -rf {device,vendor,kernel}/daria; \
 rm -rf {device,hardware}/mediatek; \
 git clone https://github.com/LineageOS/android_device_mediatek_sepolicy_vndr -b lineage-22.2 device/mediatek/sepolicy_vndr && \
