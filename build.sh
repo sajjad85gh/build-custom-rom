@@ -10,7 +10,7 @@ rm -rf {device,vendor,kernel}/daria; \
 rm -rf {device,hardware}/mediatek; \
 git clone https://github.com/LineageOS/android_device_mediatek_sepolicy_vndr -b lineage-22.2 device/mediatek/sepolicy_vndr && \
 git clone https://github.com/daria-community/vendor_daria_zahedan -b lineage-22.2 vendor/daria/zahedan && \
-git clone https://github.com/daria-community/device_daria_zahedan -b lineage-22.2 device/daria/zahedan-unified && \
+git clone https://github.com/sajjad85gh/device_daria_zahedan_temp -b lineage-22.2 device/daria/zahedan-unified && \
 git clone https://github.com/LineageOS/android_hardware_mediatek -b lineage-22.2 hardware/mediatek && \
 git clone https://github.com/sajjad85gh/kernel-volla-mt6877 kernel/daria/mt6877 && \
 . build/envsetup.sh && \
