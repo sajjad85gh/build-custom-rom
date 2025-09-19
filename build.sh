@@ -12,7 +12,7 @@ git clone https://github.com/LineageOS/android_device_mediatek_sepolicy_vndr -b 
 git clone https://github.com/daria-community/vendor_daria_zahedan -b upstream/lineage-22.2 vendor/daria/zahedan && \
 git clone https://github.com/sajjad85gh/device_daria_zahedan_temp -b upstream/lineage-22.2 device/daria/zahedan-unified && \
 git clone https://github.com/LineageOS/android_hardware_mediatek -b lineage-22.2 hardware/mediatek && \
-git clone https://github.com/daria-community/kernel_volla_mt6877 -b halium-13.0 kernel/daria/mt6877 && \
+git clone https://github.com/daria-community/kernel_volla_mt6877 -b upstream/halium-13.0 kernel/daria/mt6877 && \
 . build/envsetup.sh && \
 lunch lineage_zahedan-bp1a-userdebug && \
 mka bacon
