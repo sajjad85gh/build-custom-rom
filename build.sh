@@ -15,4 +15,5 @@ git clone https://github.com/LineageOS/android_hardware_mediatek -b lineage-22.2
 git clone https://github.com/daria-community/kernel_volla_mt6877 -b itisFarzin/testing/lineage-23.0 kernel/daria/mt6877 && \
 . build/envsetup.sh && \
 lunch lineage_zahedan-bp2a-eng && \
+make installclean && \
 mka bacon
