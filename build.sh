@@ -1,6 +1,6 @@
 #!/bin/bash
 rm -rf .repo/local_manifests
-repo init -u https://github.com/crdroidandroid/android.git -b 16.0 --git-lfs --no-clone-bundle && \
+repo init -u https://github.com/Evolution-X/manifest -b bka --git-lfs --no-clone-bundle && \
 /opt/crave/resync.sh && \
 # cd build/soong && \
 # wget -O 0001-soong-HACK-disable-soong_filesystem_creator.patch https://raw.githubusercontent.com/sajjad85gh/build-custom-rom/main/0001-soong-HACK-disable-soong_filesystem_creator.patch && \
@@ -16,4 +16,4 @@ git clone https://github.com/daria-community/kernel_volla_mt6877 -b itisFarzin/t
 . build/envsetup.sh && \
 lunch lineage_zahedan-bp2a-eng && \
 make installclean && \
-mka bacon
+m evolution
