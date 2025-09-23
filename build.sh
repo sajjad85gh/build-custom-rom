@@ -13,7 +13,7 @@ git clone https://github.com/daria-community/vendor_daria_zahedan -b upstream/li
 git clone https://github.com/daria-community/device_daria_zahedan -b upstream/lineage-22.2 device/daria/zahedan-unified && \
 git clone https://github.com/LineageOS/android_hardware_mediatek -b lineage-22.2 hardware/mediatek && \
 git clone https://github.com/daria-community/kernel_volla_mt6877 -b itisFarzin/testing/lineage-23.0 kernel/daria/mt6877 && \
-. build/envsetup.sh && \
+source build/envsetup.sh && \
 lunch lineage_zahedan-bp1a-eng && \
 make installclean && \
 m evolution
