@@ -26,7 +26,7 @@ git clone ${LOCAL_MANIFEST_URL} -b main .repo/local_manifests
 # cd -
 
 # ── Build ──────────────────────────────────────────────
-source build/envsetup.sh
+. build/envsetup.sh
 lunch ${ROM_NAME}_${DEVICE}-eng
 make installclean
 m evolution
