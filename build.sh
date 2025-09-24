@@ -2,9 +2,9 @@
 
 # ── Config ─────────────────────────────────────────────
 ROM_NAME="lineage"
-ROM_BRANCH="16.0"
+ROM_BRANCH="bka"
 DEVICE="zahedan-bp2a"
-MANIFEST_URL="$ repo init -u https://github.com/crdroidandroid/android.git"
+MANIFEST_URL="repo init -u https://github.com/Evolution-X/manifest"
 LOCAL_MANIFEST_URL="https://github.com/sajjad85gh/local_manifests.git"
 
 # ── Init repo ──────────────────────────────────────────
@@ -29,4 +29,4 @@ git clone ${LOCAL_MANIFEST_URL} -b main .repo/local_manifests
 source build/envsetup.sh
 lunch ${ROM_NAME}_${DEVICE}-eng
 make installclean
-mka bacon
+m evolution
