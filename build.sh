@@ -3,7 +3,7 @@
 # ── Config ─────────────────────────────────────────────
 ROM_NAME="lineage"
 ROM_BRANCH="bka"
-DEVICE="zahedan-bp2a"
+DEVICE="Pacman-bp2a"
 MANIFEST_URL="https://github.com/Evolution-X/manifest.git"
 LOCAL_MANIFEST_URL="https://github.com/sajjad85gh/local_manifests.git"
 
