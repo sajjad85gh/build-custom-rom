@@ -23,6 +23,9 @@ git clone ${LOCAL_MANIFEST_URL} -b main .repo/local_manifests
 #   https://raw.githubusercontent.com/sajjad85gh/build-custom-rom/main/0001-soong-HACK-disable-soong_filesystem_creator.patch
 # git am 0001-soong-HACK-disable-soong_filesystem_creator.patch
 # cd -
+# ── export
+export BUILD_USERNAME=itis_sajjad
+export BUILD_HOSTNAME=crave
 
 # ── Build
 . build/envsetup.sh
