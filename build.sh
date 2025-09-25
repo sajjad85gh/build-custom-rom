@@ -4,28 +4,27 @@
 ROM_NAME="lineage"
 ROM_BRANCH="bka"
 DEVICE="zahedan-bp2a"
-MANIFEST_URL="repo init -u https://github.com/Evolution-X/manifest"
+MANIFEST_URL="https://github.com/Evolution-X/manifest.git"
 LOCAL_MANIFEST_URL="https://github.com/sajjad85gh/local_manifests.git"
 
-# ── Init repo ──────────────────────────────────────────
+# ── Init repo
 rm -rf .repo/local_manifests
 repo init -u ${MANIFEST_URL} -b ${ROM_BRANCH} --git-lfs --no-clone-bundle
 
-# ── Clone local_manifests ──────────────────────────────
-echo "[*] Cloning local manifests..."
+# ── Clone local_manifests
 git clone ${LOCAL_MANIFEST_URL} -b main .repo/local_manifests
 
-# ── Sync ───────────────────────────────────────────────
+# ── Sync
 /opt/crave/resync.sh
 
-# ── Apply patch ────────────────────────────────────────
+# ── Apply patch
 # cd build/soong
 # wget -O 0001-soong-HACK-disable-soong_filesystem_creator.patch \
 #   https://raw.githubusercontent.com/sajjad85gh/build-custom-rom/main/0001-soong-HACK-disable-soong_filesystem_creator.patch
 # git am 0001-soong-HACK-disable-soong_filesystem_creator.patch
 # cd -
 
-# ── Build ──────────────────────────────────────────────
+# ── Build
 . build/envsetup.sh
 lunch ${ROM_NAME}_${DEVICE}-eng
 make installclean
