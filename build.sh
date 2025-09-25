@@ -1,15 +1,24 @@
 #!/bin/bash
+
+# ── Config ─────────────────────────────────────────────
+ROM_NAME="lineage"
+ROM_BRANCH="bka"
+DEVICE="Pacman-bp2a"
+MANIFEST_URL="https://github.com/Evolution-X/manifest.git"
+LOCAL_MANIFEST_URL="https://github.com/sajjad85gh/local_manifests.git"
+
+# ── Init repo
 rm -rf .repo/local_manifests
-repo init -u https://github.com/LineageOS/android.git -b lineage-22.2 --git-lfs --no-clone-bundle && \
-/opt/crave/resync.sh && \
-rm -rf {device,vendor,kernel,android/hardware}/nothing; \
-rm -rf {device,hardware}/mediatek; \
-git clone https://github.com/LineageOS/android_device_mediatek_sepolicy_vndr -b lineage-22.2 device/mediatek/sepolicy_vndr && \
-git clone https://gitlab.com/nothing-2a/proprietary_vendor_nothing_Pacman -b lineage-22.2 vendor/nothing/Pacman && \
-git clone https://github.com/Nothing-2A/android_device_nothing_Aerodactyl -b lineage-22.2 device/nothing/Aerodactyl && \
-git clone https://github.com/LineageOS/android_hardware_mediatek -b lineage-22.2 hardware/mediatek && \
-git clone https://github.com/Nothing-2A/android_device_nothing_Aerodactyl-kernel -b lineage-22.2 kernel/nothing/mt6886 && \
-git clone https://github.com/Nothing-2A/android_hardware_nothing -b lineage-22.2 hardware/nothing && \
-. build/envsetup.sh && \
-lunch lineage_Pacman-bp1a-userdebug && \
-mka bacon
+repo init -u ${MANIFEST_URL} -b ${ROM_BRANCH} --git-lfs --no-clone-bundle
+
+# ── Clone local_manifests
+git clone ${LOCAL_MANIFEST_URL} -b main .repo/local_manifests
+
+# ── Sync
+/opt/crave/resync.sh
+
+# ── Build
+. build/envsetup.sh
+lunch ${ROM_NAME}_${DEVICE}-eng
+make installclean
+m evolution
