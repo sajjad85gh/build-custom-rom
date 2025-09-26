@@ -3,7 +3,7 @@
 # ── Config ─────────────────────────────────────────────
 ROM_NAME="lineage"
 ROM_BRANCH="16.0"
-DEVICE="Pacman-bp2a"
+DEVICE="Pacman"
 MANIFEST_URL="https://github.com/crdroidandroid/android.git"
 LOCAL_MANIFEST_URL="https://github.com/sajjad85gh/local_manifests.git"
 
@@ -17,28 +17,43 @@ git clone ${LOCAL_MANIFEST_URL} -b main .repo/local_manifests
 # ── Sync
 /opt/crave/resync.sh
 
-# ── Apply patch
-# Aperture
-cd packages/apps/Aperture
-git fetch https://github.com/Nothing-2A/android_packages_apps_Aperture 36c9507ecf2a1a798d2e7931d9019bacc3cc6052
-git cherry-pick 36c9507ecf2a1a798d2e7931d9019bacc3cc6052 || true
+# ── Apply patch: Aperture
+if [ -d "packages/apps/Aperture" ]; then
+    echo "[*] Applying patch Aperture..."
+    pushd packages/apps/Aperture >/dev/null
+    git fetch https://github.com/Nothing-2A/android_packages_apps_Aperture 36c9507ecf2a1a798d2e7931d9019bacc3cc6052
+    git cherry-pick -X theirs 36c9507ecf2a1a798d2e7931d9019bacc3cc6052 || git reset --hard FETCH_HEAD
+    popd >/dev/null
+else
+    echo "⚠️ Skipped Aperture patch: path not found"
+fi
 
-# Lineage compat hardware
-cd hardware/lineage/compat
-git fetch https://review.lineageos.org/LineageOS/android_hardware_lineage_compat refs/changes/04/447604/1
-git cherry-pick FETCH_HEAD || true
+# ── Apply patch: Lineage compat hardware
+if [ -d "hardware/lineage/compat" ]; then
+    echo "[*] Applying patch Lineage compat hardware..."
+    pushd hardware/lineage/compat >/dev/null
+    git fetch https://review.lineageos.org/LineageOS/android_hardware_lineage_compat refs/changes/04/447604/1
+    git cherry-pick -X theirs FETCH_HEAD || git reset --hard FETCH_HEAD
+    popd >/dev/null
+else
+    echo "⚠️ Skipped Lineage compat patch: path not found"
+fi
 
-# UDFPS dimming
-cd frameworks/base
-git fetch https://github.com/Nothing-2A/android_frameworks_base 79b3ae0b06ffdbadde3d2106a2bbf895b074ffb2
-git cherry-pick 79b3ae0b06ffdbadde3d2106a2bbf895b074ffb2 || true
+# ── Apply patch: UDFPS dimming
+if [ -d "frameworks/base" ]; then
+    echo "[*] Applying patch UDFPS dimming..."
+    pushd frameworks/base >/dev/null
+    git fetch https://github.com/Nothing-2A/android_frameworks_base 79b3ae0b06ffdbadde3d2106a2bbf895b074ffb2
+    git cherry-pick -X theirs 79b3ae0b06ffdbadde3d2106a2bbf895b074ffb2 || git reset --hard FETCH_HEAD
+    popd >/dev/null
+else
+    echo "⚠️ Skipped UDFPS dimming patch: path not found"
+fi
 
 # ── export
 export BUILD_USERNAME=itis_sajjad
 export BUILD_HOSTNAME=crave
 
 # ── Build
-. build/envsetup.sh
-lunch ${ROM_NAME}_${DEVICE}-eng
-make installclean
-mka bacon
+source build/envsetup.sh 
+brunch ${DEVICE} user
