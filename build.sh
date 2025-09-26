@@ -2,7 +2,7 @@
 
 # ── Config ─────────────────────────────────────────────
 ROM_NAME="lineage"
-ROM_BRANCH="bka"
+ROM_BRANCH="16.0"
 DEVICE="Pacman-bp2a"
 MANIFEST_URL="https://github.com/crdroidandroid/android.git"
 LOCAL_MANIFEST_URL="https://github.com/sajjad85gh/local_manifests.git"
