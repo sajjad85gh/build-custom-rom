@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# ── Config ─────────────────────────────────────────────
-ROM_NAME="lineage"
+# ── Config
 ROM_BRANCH="16.0"
 DEVICE="Pacman"
 MANIFEST_URL="https://github.com/crdroidandroid/android.git"
@@ -55,5 +54,6 @@ export BUILD_USERNAME=itis_sajjad
 export BUILD_HOSTNAME=crave
 
 # ── Build
-source build/envsetup.sh 
+source build/envsetup.sh
+make installclean
 brunch ${DEVICE} user
