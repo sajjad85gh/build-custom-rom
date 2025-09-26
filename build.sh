@@ -18,11 +18,21 @@ git clone ${LOCAL_MANIFEST_URL} -b main .repo/local_manifests
 /opt/crave/resync.sh
 
 # ── Apply patch
-# cd build/soong
-# wget -O 0001-soong-HACK-disable-soong_filesystem_creator.patch \
-#   https://raw.githubusercontent.com/sajjad85gh/build-custom-rom/main/0001-soong-HACK-disable-soong_filesystem_creator.patch
-# git am 0001-soong-HACK-disable-soong_filesystem_creator.patch
-# cd -
+# Aperture
+cd packages/apps/Aperture
+git fetch https://github.com/Nothing-2A/android_packages_apps_Aperture 36c9507ecf2a1a798d2e7931d9019bacc3cc6052
+git cherry-pick 36c9507ecf2a1a798d2e7931d9019bacc3cc6052 || true
+
+# Lineage compat hardware
+cd hardware/lineage/compat
+git fetch https://review.lineageos.org/LineageOS/android_hardware_lineage_compat refs/changes/04/447604/1
+git cherry-pick FETCH_HEAD || true
+
+# UDFPS dimming
+cd frameworks/base
+git fetch https://github.com/Nothing-2A/android_frameworks_base 79b3ae0b06ffdbadde3d2106a2bbf895b074ffb2
+git cherry-pick 79b3ae0b06ffdbadde3d2106a2bbf895b074ffb2 || true
+
 # ── export
 export BUILD_USERNAME=itis_sajjad
 export BUILD_HOSTNAME=crave
