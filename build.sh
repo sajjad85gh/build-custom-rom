@@ -4,7 +4,7 @@
 ROM_NAME="lineage"
 ROM_BRANCH="bka"
 DEVICE="Pacman-bp2a"
-MANIFEST_URL="https://github.com/Evolution-X/manifest.git"
+MANIFEST_URL="https://github.com/crdroidandroid/android.git"
 LOCAL_MANIFEST_URL="https://github.com/sajjad85gh/local_manifests.git"
 
 # ── Init repo
@@ -41,4 +41,4 @@ export BUILD_HOSTNAME=crave
 . build/envsetup.sh
 lunch ${ROM_NAME}_${DEVICE}-eng
 make installclean
-m evolution
+mka bacon
