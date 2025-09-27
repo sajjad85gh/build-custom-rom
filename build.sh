@@ -27,24 +27,24 @@ else
     echo "⚠️ Skipped Aperture patch: path not found"
 fi
 
-# ── Apply patch: Lineage compat hardware
-if [ -d "hardware/lineage/compat" ]; then
-    echo "[*] Applying patch Lineage compat hardware..."
-    pushd hardware/lineage/compat >/dev/null
-    git fetch https://review.lineageos.org/LineageOS/android_hardware_lineage_compat refs/changes/04/447604/1
-    git cherry-pick -X theirs FETCH_HEAD || git reset --hard FETCH_HEAD
+# # ── Apply patch: Lineage compat hardware
+# if [ -d "hardware/lineage/compat" ]; then
+#     echo "[*] Applying patch Lineage compat hardware..."
+#     pushd hardware/lineage/compat >/dev/null
+#     git fetch https://review.lineageos.org/LineageOS/android_hardware_lineage_compat refs/changes/04/447604/1
+#     git cherry-pick -X theirs FETCH_HEAD || git reset --hard FETCH_HEAD
 
-    # ── Auto fix for AudioTrack.cpp issue
-    COMPAT_FILE="libaudioclient/AudioTrack.cpp"
-    if [ -f "$COMPAT_FILE" ]; then
-        echo "[*] Fixing legacy_callback_t in $COMPAT_FILE..."
-        sed -i 's/AudioTrack::legacy_callback_t/legacy_callback_t/g' "$COMPAT_FILE"
-    fi
+#     # ── Auto fix for AudioTrack.cpp issue
+#     COMPAT_FILE="libaudioclient/AudioTrack.cpp"
+#     if [ -f "$COMPAT_FILE" ]; then
+#         echo "[*] Fixing legacy_callback_t in $COMPAT_FILE..."
+#         sed -i 's/AudioTrack::legacy_callback_t/legacy_callback_t/g' "$COMPAT_FILE"
+#     fi
 
-    popd >/dev/null
-else
-    echo "⚠️ Skipped Lineage compat patch: path not found"
-fi
+#     popd >/dev/null
+# else
+#     echo "⚠️ Skipped Lineage compat patch: path not found"
+# fi
 
 # ── Apply patch: UDFPS dimming
 if [ -d "frameworks/base" ]; then
