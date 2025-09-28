@@ -1,5 +1,7 @@
 #!/bin/bash
 
+rm -rf {device,vendor,kernel,hardware}/nothing
+rm -rf {device,hardware}/mediatek
 # ── Config
 ROM_BRANCH="16.0"
 DEVICE="Pacman"
