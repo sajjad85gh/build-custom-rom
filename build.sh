@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # ── Config ─────────────────────────────────────────────
-ROM_BRANCH="15.0"
+ROM_BRANCH="15"
 DEVICE="zahedan"
-MANIFEST_URL="https://github.com/crdroidandroid/android.git"
+MANIFEST_URL="https://github.com/ProjectInfinity-X/manifest.git"
 LOCAL_MANIFEST_URL="https://github.com/sajjad85gh/local_manifests.git"
 
 # ── Init repo
