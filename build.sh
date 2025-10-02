@@ -30,4 +30,4 @@ cd -
 # ── Build
 . build/envsetup.sh
 make installclean
-brunch ${DEVICE}
+brunch ${DEVICE} user
