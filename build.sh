@@ -29,6 +29,6 @@ cd -
 
 # ── Build
 . build/envsetup.sh
-lunch infinity_${DEVICE}-user
+lunch infinity_${DEVICE}-userdebug
 make installclean
 m bacon
