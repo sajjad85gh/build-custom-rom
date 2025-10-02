@@ -31,4 +31,4 @@ cd -
 . build/envsetup.sh
 lunch infinity_${DEVICE}-userdebug
 make installclean
-m bacon
+mka bacon
