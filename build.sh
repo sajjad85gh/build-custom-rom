@@ -20,6 +20,9 @@ git clone https://github.com/LineageOS/android_device_mediatek_sepolicy_vndr -b 
 git clone https://github.com/LineageOS/android_hardware_mediatek -b lineage-22.2 hardware/mediatek
 git clone https://github.com/sajjad85gh/proprietary_vendor_daria_zahedan -b fifteen-qpr2 vendor/daria/zahedan
 
+# ── Clone LMODynamicWallpaper
+git clone https://github.com/LMODroid/platform_packages_apps_LMODynamicWallpaper -b main packages/apps/LMODynamicWallpaper
+  
 # ── Sync
 /opt/crave/resync.sh
 
@@ -33,5 +36,6 @@ cd -
 # ── Build
 . build/envsetup.sh
 breakfast zahedan userdebug
+echo "PRODUCT_PACKAGES += LMODynamicWallpaper" >> device/daria/zahedan-unified/device.mk
 make installclean
 mka bacon
