@@ -36,6 +36,5 @@ cd -
 # ── Build
 . build/envsetup.sh
 breakfast zahedan userdebug
-echo "PRODUCT_PACKAGES += LMODynamicWallpaper" >> device/daria/zahedan-unified/device.mk
 make installclean
 mka bacon
