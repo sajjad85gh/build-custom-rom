@@ -14,7 +14,7 @@ repo init -u ${MANIFEST_URL} -b ${ROM_BRANCH} --git-lfs --no-clone-bundle
 
 # ── Clone local_manifests
 # git clone ${LOCAL_MANIFEST_URL} -b main .repo/local_manifests
-git clone https://github.com/daria-community/device_daria_zahedan -b Itis_Sajjad/testing/Matrixx-15-qpr2 device/daria/zahedan-unified
+git clone https://github.com/daria-community/device_daria_zahedan -b Itis_Sajjad/temp/Matrixx-15-qpr2 device/daria/zahedan-unified
 git clone https://github.com/daria-community/kernel_volla_mt6877 -b itisFarzin/testing/lineage-23.0 kernel/daria/mt6877
 git clone https://github.com/LineageOS/android_device_mediatek_sepolicy_vndr -b lineage-22.2 device/mediatek/sepolicy_vndr
 git clone https://github.com/LineageOS/android_hardware_mediatek -b lineage-22.2 hardware/mediatek
@@ -32,9 +32,11 @@ wget -O 0001-soong-HACK-disable-soong_filesystem_creator.patch \
   https://raw.githubusercontent.com/sajjad85gh/build-custom-rom/main/0001-soong-HACK-disable-soong_filesystem_creator.patch
 git am 0001-soong-HACK-disable-soong_filesystem_creator.patch
 cd -
-
+# ── export
+export BUILD_USERNAME=Itis_Sajjad
+export BUILD_HOSTNAME=crave
 # ── Build
-. build/envsetup.sh
+. build/envsetup.sh 
 breakfast zahedan userdebug
 make installclean
 mka bacon
