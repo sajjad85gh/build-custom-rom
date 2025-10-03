@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # ── Config ─────────────────────────────────────────────
-ROM_BRANCH="15"
+ROM_BRANCH="15.0"
 DEVICE="zahedan"
-MANIFEST_URL="https://github.com/ProjectInfinity-X/manifest.git"
+MANIFEST_URL="https://github.com/ProjectMatrixx/android.git"
 # LOCAL_MANIFEST_URL="https://github.com/sajjad85gh/local_manifests.git"
 
 # ── Init repo
@@ -14,7 +14,7 @@ repo init -u ${MANIFEST_URL} -b ${ROM_BRANCH} --git-lfs --no-clone-bundle
 
 # ── Clone local_manifests
 # git clone ${LOCAL_MANIFEST_URL} -b main .repo/local_manifests
-git clone https://github.com/daria-community/device_daria_zahedan -b Itis_Sajjad/testing/Infinity-15-qpr2 device/daria/zahedan-unified
+git clone https://github.com/daria-community/device_daria_zahedan -b Itis_Sajjad/testing/Matrixx-15-qpr2 device/daria/zahedan-unified
 git clone https://github.com/daria-community/kernel_volla_mt6877 -b itisFarzin/testing/lineage-23.0 kernel/daria/mt6877
 git clone https://github.com/LineageOS/android_device_mediatek_sepolicy_vndr -b lineage-22.2 device/mediatek/sepolicy_vndr
 git clone https://github.com/LineageOS/android_hardware_mediatek -b lineage-22.2 hardware/mediatek
@@ -32,6 +32,6 @@ cd -
 
 # ── Build
 . build/envsetup.sh
-lunch infinity_${DEVICE}-userdebug
+breakfast zahedan userdebug
 make installclean
 mka bacon
