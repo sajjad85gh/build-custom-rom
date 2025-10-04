@@ -7,6 +7,7 @@ MANIFEST_URL="https://github.com/ProjectMatrixx/android.git"
 LOCAL_MANIFEST_URL="https://github.com/sajjad85gh/local_manifests.git"
 
 # ── Init repo
+rm -rf packages/apps/MatrixxSettings
 rm -rf .repo/local_manifests
 rm -rf {device,vendor,kernel}/daria
 rm -rf {device,hardware}/mediatek
