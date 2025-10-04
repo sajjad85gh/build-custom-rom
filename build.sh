@@ -11,6 +11,10 @@ rm -rf .repo/local_manifests
 rm -rf {device,vendor,kernel}/daria
 rm -rf {device,hardware}/mediatek
 repo init -u ${MANIFEST_URL} -b ${ROM_BRANCH} --git-lfs --no-clone-bundle
+
+# ── Sync
+/opt/crave/resync.sh
+
 rm -rf packages/apps/MatrixxSettings
 
 # ── Clone local_manifests
@@ -25,9 +29,6 @@ git clone ${LOCAL_MANIFEST_URL} -b main .repo/local_manifests
 # # ── Clone LMODynamicWallpaper
 # git clone https://github.com/LMODroid/platform_packages_apps_LMODynamicWallpaper -b fifteen-qpr2 packages/apps/LMODynamicWallpaper
   
-# ── Sync
-/opt/crave/resync.sh
-
 # ── Apply patch
 cd build/soong
 wget -O 0001-soong-HACK-disable-soong_filesystem_creator.patch \
