@@ -6,16 +6,12 @@ DEVICE="zahedan"
 MANIFEST_URL="https://github.com/ProjectMatrixx/android.git"
 LOCAL_MANIFEST_URL="https://github.com/sajjad85gh/local_manifests.git"
 
-# ── Init repo
 rm -rf .repo/local_manifests
 rm -rf {device,vendor,kernel}/daria
 rm -rf {device,hardware}/mediatek
+
+# ── Init repo
 repo init -u ${MANIFEST_URL} -b ${ROM_BRANCH} --git-lfs --no-clone-bundle
-
-# ── Sync
-/opt/crave/resync.sh
-
-rm -rf packages/apps/MatrixxSettings
 
 # ── Clone local_manifests
 git clone ${LOCAL_MANIFEST_URL} -b main .repo/local_manifests
@@ -26,9 +22,12 @@ git clone ${LOCAL_MANIFEST_URL} -b main .repo/local_manifests
 # git clone https://github.com/LineageOS/android_hardware_mediatek -b lineage-22.2 hardware/mediatek
 # git clone https://github.com/sajjad85gh/proprietary_vendor_daria_zahedan -b fifteen-qpr2 vendor/daria/zahedan
 
+# ── Sync
+/opt/crave/resync.sh
+
 # # ── Clone LMODynamicWallpaper
 # git clone https://github.com/LMODroid/platform_packages_apps_LMODynamicWallpaper -b fifteen-qpr2 packages/apps/LMODynamicWallpaper
-  
+
 # ── Apply patch
 cd build/soong
 wget -O 0001-soong-HACK-disable-soong_filesystem_creator.patch \
