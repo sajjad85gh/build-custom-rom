@@ -33,7 +33,7 @@ wget -O 0001-soong-HACK-disable-soong_filesystem_creator.patch \
 git am 0001-soong-HACK-disable-soong_filesystem_creator.patch
 cd -
 # ── export
-export BUILD_USERNAME=Itis_Sajjad
+export BUILD_USERNAME=Sajjad
 export BUILD_HOSTNAME=crave
 
 # ── Build
