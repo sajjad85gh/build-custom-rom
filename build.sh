@@ -7,11 +7,11 @@ MANIFEST_URL="https://github.com/ProjectMatrixx/android.git"
 LOCAL_MANIFEST_URL="https://github.com/sajjad85gh/local_manifests.git"
 
 # ── Init repo
-rm -rf packages/apps/MatrixxSettings
 rm -rf .repo/local_manifests
 rm -rf {device,vendor,kernel}/daria
 rm -rf {device,hardware}/mediatek
 repo init -u ${MANIFEST_URL} -b ${ROM_BRANCH} --git-lfs --no-clone-bundle
+rm -rf packages/apps/MatrixxSettings
 
 # ── Clone local_manifests
 git clone ${LOCAL_MANIFEST_URL} -b main .repo/local_manifests
