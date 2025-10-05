@@ -36,9 +36,9 @@ git am 0001-soong-HACK-disable-soong_filesystem_creator.patch
 cd -
 
 # ── Include KernelSU-Next
-cd kernel/daria/mt6877
-curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -
-cd -
+# cd kernel/daria/mt6877
+# curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -
+# cd -
 
 # ── export
 export BUILD_USERNAME=Sajjad
