@@ -4,7 +4,7 @@ rm -rf {device,vendor,kernel,hardware}/nothing
 rm -rf {device,hardware}/mediatek
 # ── Config
 ROM_BRANCH="15.0"
-DEVICE="PacmanPro"
+DEVICE="Pacman"
 MANIFEST_URL="https://github.com/ProjectMatrixx/android.git"
 LOCAL_MANIFEST_URL="https://github.com/sajjad85gh/local_manifests.git"
 
@@ -12,7 +12,7 @@ LOCAL_MANIFEST_URL="https://github.com/sajjad85gh/local_manifests.git"
 repo init -u ${MANIFEST_URL} -b ${ROM_BRANCH} --git-lfs --no-clone-bundle
 
 # ── Clone local_manifests
-git clone ${LOCAL_MANIFEST_URL} -b main .repo/local_manifests
+git clone ${LOCAL_MANIFEST_URL} -b Pacman .repo/local_manifests
 
 # ── Sync
 /opt/crave/resync.sh
