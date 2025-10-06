@@ -4,7 +4,7 @@ rm -rf {device,vendor,kernel,hardware}/nothing
 rm -rf {device,hardware}/mediatek
 # ── Config
 ROM_BRANCH="15.0"
-DEVICE="Pacman"
+DEVICE="PacmanPro"
 MANIFEST_URL="https://github.com/ProjectMatrixx/android.git"
 LOCAL_MANIFEST_URL="https://github.com/sajjad85gh/local_manifests.git"
 
