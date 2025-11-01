@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 # ── Trap for cleanup ───────────────────────────────────
 TMPDIR=$(mktemp -d)
 trap 'rm -rf "$TMPDIR"' EXIT
