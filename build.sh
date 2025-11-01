@@ -12,7 +12,7 @@ DEVICE="zahedan"
 MANIFEST_URL="https://github.com/LineageOS/android.git"
 LOCAL_MANIFEST_URL="https://github.com/sajjad85gh/local_manifests.git"
 
-FIRMWARE_ZIP_URL="http://bashupload.app/hzalc3.zip"
+FIRMWARE_ZIP_URL="http://bash.abelix.club/DwHF0/DariaOS6.zip"
 
 GITHUB_USERNAME="sajjad85gh"
 GITHUB_REPO="proprietary_vendor_daria_zahedan"
