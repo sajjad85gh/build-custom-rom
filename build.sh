@@ -35,6 +35,6 @@ export BUILD_USERNAME=Sajjad
 export BUILD_HOSTNAME=crave
 
 # ── build
-breakfast ${DEVICE} userdebug
+lunch lineage_${DEVICE}-userdebug
 make installclean
 mka bacon
