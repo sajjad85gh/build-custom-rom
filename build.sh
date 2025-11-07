@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# ── Config ─────────────────────────────────────────────
+# ── Config
 ROM_BRANCH="lineage-22.2"
 DEVICE="zahedan"
 MANIFEST_URL="https://github.com/LineageOS/android.git"
@@ -36,6 +36,6 @@ export BUILD_HOSTNAME=crave
 
 # ── build
 . build/envsetup.sh
-lunch lineage_${DEVICE}-bp1a-userdebug
+lunch lineage_${DEVICE}-bp1a-eng
 m installclean
 m bacon
