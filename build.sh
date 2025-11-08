@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # ── Config
-ROM_BRANCH="lineage-22.2"
+ROM_BRANCH="vic"
 DEVICE="zahedan"
-MANIFEST_URL="https://github.com/LineageOS/android.git"
+MANIFEST_URL="https://github.com/Evolution-X/manifest.git"
 LOCAL_MANIFEST_URL="https://github.com/sajjad85gh/local_manifests.git"
 
 # ── Clean
@@ -38,4 +38,4 @@ export BUILD_HOSTNAME=crave
 . build/envsetup.sh
 lunch lineage_${DEVICE}-bp1a-eng
 m installclean
-m bacon
+m evolution
