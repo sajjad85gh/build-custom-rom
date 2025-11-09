@@ -13,7 +13,7 @@ rm -rf {device,hardware}/mediatek
 
 # ── Init repo
 repo init -u ${MANIFEST_URL} -b ${ROM_BRANCH} --git-lfs --no-clone-bundle
-git clone ${LOCAL_MANIFEST_URL} -b evo15 .repo/local_manifests
+git clone ${LOCAL_MANIFEST_URL} -b main .repo/local_manifests
 
 # ── Sync
 /opt/crave/resync.sh
