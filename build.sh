@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # ── Config
-ROM_BRANCH="vic"
+ROM_BRANCH="lineage-22.2"
 DEVICE="zahedan"
-MANIFEST_URL="https://github.com/Evolution-X/manifest.git"
+MANIFEST_URL="https://github.com/LineageOS/android.git"
 LOCAL_MANIFEST_URL="https://github.com/sajjad85gh/local_manifests.git"
 
 # ── Clean
