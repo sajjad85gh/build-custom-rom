@@ -38,4 +38,4 @@ export BUILD_HOSTNAME=crave
 . build/envsetup.sh
 lunch lineage_${DEVICE}-bp1a-eng
 m installclean
-m evolution
+m bacon
