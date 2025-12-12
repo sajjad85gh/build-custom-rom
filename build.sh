@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ── Config
-ROM_BRANCH="qpr2"
+ROM_BRANCH="fifteen"
 DEVICE="zahedan"
 MANIFEST_URL="https://github.com/RisingOS-Revived/android.git"
 LOCAL_MANIFEST_URL="https://github.com/sajjad85gh/local_manifests.git"
