@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # ── Config
-ROM_BRANCH="lineage-22.2"
+ROM_BRANCH="qpr2"
 DEVICE="zahedan"
-MANIFEST_URL="https://github.com/LineageOS/android.git"
+MANIFEST_URL="https://github.com/RisingOS-Revived/android.git"
 LOCAL_MANIFEST_URL="https://github.com/sajjad85gh/local_manifests.git"
 
 # ── Clean
@@ -36,6 +36,5 @@ export BUILD_HOSTNAME=crave
 
 # ── build
 . build/envsetup.sh
-lunch lineage_${DEVICE}-bp1a-eng
-m installclean
-m bacon
+riseup ${DEVICE} user
+rise b
