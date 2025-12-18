@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # ── Config
-ROM_BRANCH="fifteen"
+ROM_BRANCH="15.0"
 DEVICE="zahedan"
-MANIFEST_URL="https://github.com/RisingOS-Revived/android.git"
+MANIFEST_URL="https://github.com/ProjectMatrixx/android.git"
 LOCAL_MANIFEST_URL="https://github.com/sajjad85gh/local_manifests.git"
 
 # ── Clean
@@ -36,5 +36,6 @@ export BUILD_HOSTNAME=crave
 
 # ── build
 . build/envsetup.sh
-riseup ${DEVICE} user
-rise b
+lunch lineage_${DEVICE}-bp1a-eng
+m installclean
+m bacon
