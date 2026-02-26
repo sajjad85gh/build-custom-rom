@@ -36,4 +36,5 @@ export BUILD_HOSTNAME=crave
 
 # ── build
 . build/envsetup.sh 
-brunch ${DEVICE}
+lunch lineage_${DEVICE}-bp1a-userdebug
+m bacon
