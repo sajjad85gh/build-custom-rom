@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # ── Config
-ROM_BRANCH="16.2"
+ROM_BRANCH="16.0"
 DEVICE="crownlte"
-MANIFEST_URL="https://github.com/Lunaris-AOSP/android"
+MANIFEST_URL="https://github.com/crdroidandroid/android"
 LOCAL_MANIFEST_URL="https://github.com/sajjad85gh/local_manifests"
 
 # ── Clean
