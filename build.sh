@@ -3,8 +3,8 @@
 # ── Config
 ROM_BRANCH="16.2"
 DEVICE="crownlte"
-MANIFEST_URL="https://github.com/Lunaris-AOSP/android.git"
-LOCAL_MANIFEST_URL="https://github.com/sajjad85gh/local_manifests.git"
+MANIFEST_URL="https://github.com/Lunaris-AOSP/android"
+LOCAL_MANIFEST_URL="https://github.com/sajjad85gh/local_manifests"
 
 # ── Clean
 rm -rf .repo/local_manifests
