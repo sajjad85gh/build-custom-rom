@@ -14,14 +14,15 @@ repo init -u ${MANIFEST_URL} -b ${ROM_BRANCH} --git-lfs --no-clone-bundle
 
 # ── Clone local_manifests
 # git clone ${LOCAL_MANIFEST_URL} -b main .repo/local_manifests
-git clone https://github.com/daria-community/device_daria_zahedan -b Itis_Sajjad/testing/Infinity-15-qpr2 device/daria/zahedan-unified
-git clone https://github.com/daria-community/kernel_volla_mt6877 -b itisFarzin/testing/lineage-23.0 kernel/daria/mt6877
+git clone https://github.com/daria-community/device_daria_zahedan -b Itis_Sajjad/testing/lineage-22.2 device/daria/zahedan-unified
+git clone https://git.libremobileos.com/LMODroid-Devices/kernel_daria_mt6877 -b fifteen-qpr2 kernel/daria/mt6877
 git clone https://github.com/LineageOS/android_device_mediatek_sepolicy_vndr -b lineage-22.2 device/mediatek/sepolicy_vndr
 git clone https://github.com/LineageOS/android_hardware_mediatek -b lineage-22.2 hardware/mediatek
 git clone https://github.com/sajjad85gh/proprietary_vendor_daria_zahedan -b fifteen-qpr2 vendor/daria/zahedan
 
 # ── Sync
-/opt/crave/resync.sh
+# /opt/crave/resync.sh
+repo sync -c --no-clone-bundle --no-tags --optimized-fetch --prune --force-sync -j$(nproc --all)
 
 # ── Apply patch
 cd build/soong
@@ -34,4 +35,4 @@ cd -
 . build/envsetup.sh
 lunch infinity_${DEVICE}-userdebug
 make installclean
-mka bacon
+m bacon
