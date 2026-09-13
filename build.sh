@@ -1,40 +1,49 @@
 #!/bin/bash
+set -e
 
-# ── Config
-ROM_BRANCH="16.0"
+# ── Config ─────────────────────────────────────────────
+ROM_BRANCH="lineage-23.2"
 DEVICE="crownlte"
-MANIFEST_URL="https://github.com/crdroidandroid/android"
-LOCAL_MANIFEST_URL="https://github.com/sajjad85gh/local_manifests"
-
-# ── Clean
-rm -rf .repo/local_manifests
-rm -rf {device,vendor,kernel}/daria
-rm -rf {device,hardware}/mediatek
+BUILD_TYPE="userdebug"
+GMS_VARIANT="core"
+MANIFEST_URL="https://github.com/AxionAOSP/android.git"
+LOCAL_MANIFEST_URL="https://github.com/ExyHyperBrick/local_manifests.git"
+LOCAL_MANIFEST_BRANCH="lineage-23.2-ims"
+PATCHES_URL="https://github.com/ExyHyperBrick/local_manifests/raw/${LOCAL_MANIFEST_BRANCH}/PATCHES.zip"
+DEVICE_MK="device/samsung/${DEVICE}/lineage_${DEVICE}.mk"
 
 # ── Init repo
+rm -rf .repo/local_manifests
 repo init -u ${MANIFEST_URL} -b ${ROM_BRANCH} --git-lfs --no-clone-bundle
-git clone ${LOCAL_MANIFEST_URL} -b Exynos9810/Lunaris .repo/local_manifests
+
+# ── Clone local_manifests
+git clone ${LOCAL_MANIFEST_URL} -b ${LOCAL_MANIFEST_BRANCH} .repo/local_manifests
 
 # ── Sync
 /opt/crave/resync.sh
 
-# ── Apply patch
-# cd build/soong
-# wget -O 0001-soong-HACK-disable-soong_filesystem_creator.patch \
-#   https://raw.githubusercontent.com/sajjad85gh/build-custom-rom/main/0001-soong-HACK-disable-soong_filesystem_creator.patch
-# git am 0001-soong-HACK-disable-soong_filesystem_creator.patch
-# cd -
+# ── Init PhhIms submodule
+cd packages/apps/PhhIms
+git submodule update --init --recursive
+cd -
 
-# ── Include KernelSU-Next
-# cd kernel/daria/mt6877
-# curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -
-# cd -
+# ── Apply patches (PATCHES.zip)
+rm -rf ~/PATCHES
+wget -O /tmp/PATCHES.zip "${PATCHES_URL}"
+mkdir -p ~/PATCHES
+unzip -o /tmp/PATCHES.zip -d ~/PATCHES
+~/PATCHES/apply_patches.sh *
 
-# ── export  
-export BUILD_USERNAME=Sajjad
-export BUILD_HOSTNAME=crave
+# ── AxionOS device-tree tweak
+if [ -f "${DEVICE_MK}" ]; then
+    grep -q "TARGET_DISABLE_EPPE" "${DEVICE_MK}" || \
+        sed -i '/vendor\/lineage\/config\/common_full_phone.mk/i TARGET_DISABLE_EPPE := true' "${DEVICE_MK}"
+else
+    echo "WARNING: ${DEVICE_MK} not found — add 'TARGET_DISABLE_EPPE := true' to the device makefile manually before building."
+fi
 
-# ── build
-. build/envsetup.sh 
-lunch lineage_${DEVICE}-bp4a-userdebug
-m bacon
+# ── Build environment
+. build/envsetup.sh
+gk -s
+axion ${DEVICE} ${BUILD_TYPE} ${GMS_VARIANT}
+ax -br -j$(nproc --all)
