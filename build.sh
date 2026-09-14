@@ -18,6 +18,7 @@ repo init -u ${MANIFEST_URL} -b ${ROM_BRANCH} --git-lfs --no-clone-bundle
 
 # ── Clone local_manifests
 git clone ${LOCAL_MANIFEST_URL} -b ${LOCAL_MANIFEST_BRANCH} .repo/local_manifests
+sed -i '/<!--/,/-->/d' .repo/local_manifests/roomservice.xml
 
 # ── Sync
 /opt/crave/resync.sh
