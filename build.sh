@@ -7,9 +7,9 @@ rm -rf {device,vendor,kernel,hardware}/nothing
 rm -rf {device,hardware}/mediatek
 
 # ── Config
-ROM_BRANCH="Cinderella"
+ROM_BRANCH="lineage-24.0"
 DEVICE="Pacman"
-MANIFEST_URL="https://github.com/Miku-UI/manifesto.git"
+MANIFEST_URL="https://github.com/LineageOS/android.git"
 LOCAL_MANIFEST_URL="https://github.com/sajjad85gh/local_manifests.git"
 
 # ── Init repo
@@ -47,5 +47,5 @@ export BUILD_HOSTNAME=crave
 # ── Build crDroid
 . build/envsetup.sh
 make installclean
-lunch miku_${DEVICE}-cp2a-userdebug
-make diva
+lunch lineage_${DEVICE}-cp2a-userdebug
+mka bacon
