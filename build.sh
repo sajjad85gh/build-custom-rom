@@ -30,7 +30,7 @@ PATCHES=(
 for entry in "${PATCHES[@]}"; do
   IFS="|" read -r REPO_PATH COMMIT_SHA REMOTE_URL <<< "$entry"
   echo -e "\n[*] $COMMIT_SHA -> $REPO_PATH"
-  [ -d "$REPO_PATH" ] || { echo "[!] $REPO_PATH doesn't exist" exit 1; }
+  [ -d "$REPO_PATH" ] || { echo "[!] $REPO_PATH doesn't exist"; exit 1; }
   PATCH_FILE=$(mktemp)
   curl -fsSL "$REMOTE_URL/commit/$COMMIT_SHA.patch" -o "$PATCH_FILE" || { echo "[!] download failed"; exit 1; }
   pushd "$REPO_PATH" > /dev/null
