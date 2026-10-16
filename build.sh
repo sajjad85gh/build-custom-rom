@@ -7,9 +7,9 @@ rm -rf {device,vendor,kernel,hardware}/nothing
 rm -rf {device,hardware}/mediatek
 
 # ── Config
-ROM_BRANCH="lineage-24.0"
+ROM_BRANCH="Cinderella"
 DEVICE="Pacman"
-MANIFEST_URL="https://github.com/LineageOS/android.git"
+MANIFEST_URL="https://github.com/Miku-UI/manifesto.git"
 LOCAL_MANIFEST_URL="https://github.com/sajjad85gh/local_manifests.git"
 
 # ── Init repo
@@ -48,4 +48,4 @@ export BUILD_HOSTNAME=crave
 . build/envsetup.sh
 make installclean
 lunch lineage_${DEVICE}-cp2a-userdebug
-mka bacon
+make diva
