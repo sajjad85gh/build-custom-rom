@@ -47,5 +47,5 @@ export BUILD_HOSTNAME=crave
 # ── Build crDroid
 . build/envsetup.sh
 make installclean
-lunch lineage_${DEVICE}-cp2a-userdebug
+lunch miku_${DEVICE}-cp2a-userdebug
 make diva
