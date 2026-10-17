@@ -1,11 +1,15 @@
 #!/bin/bash
+
+set -o pipefail
+
 rm -rf .repo/local_manifests
 rm -rf {device,vendor,kernel,hardware}/nothing
 rm -rf {device,hardware}/mediatek
+
 # ── Config
-ROM_BRANCH="15.0"
-DEVICE="PacmanPro"
-MANIFEST_URL="https://github.com/ProjectMatrixx/android.git"
+ROM_BRANCH="lineage-24.0"
+DEVICE="Pacman"
+MANIFEST_URL="https://github.com/LineageOS/android.git"
 LOCAL_MANIFEST_URL="https://github.com/sajjad85gh/local_manifests.git"
 
 # ── Init repo
@@ -16,55 +20,32 @@ git clone ${LOCAL_MANIFEST_URL} -b main .repo/local_manifests
 
 # ── Sync
 /opt/crave/resync.sh
-rm -rf hardware/lineage/interfaces/sensors
 
-# List of patches: "<repo_path>|<commit_sha>|<remote_url>"
 PATCHES=(
-  "packages/apps/Aperture|36c9507ecf2a1a798d2e7931d9019bacc3cc6052|https://github.com/Nothing-2A/android_packages_apps_Aperture"
-  "hardware/lineage/compat|60729c841a8b447896aa8108d2c0cfc0a5327041|https://github.com/LineageOS/android_hardware_lineage_compat"
+  "frameworks/native|7b7807349f7b66c61444e32e4a26b025932117d8|https://github.com/Nothing-2A/android_frameworks_native"
+  "frameworks/base|71955520858075bfeb8b52009151ba20401f27e3|https://github.com/Nothing-2A/android_frameworks_base"
 )
-
-echo "[*] Applying all patches automatically..."
+[ -d packages/apps/Aperture ] && PATCHES+=("packages/apps/Aperture|a4c34aa57ed56de60f29349a1e6d20cf8160ca15|https://github.com/Nothing-2A/android_packages_apps_Aperture")
 
 for entry in "${PATCHES[@]}"; do
   IFS="|" read -r REPO_PATH COMMIT_SHA REMOTE_URL <<< "$entry"
-  echo -e "\n[*] Applying patch $COMMIT_SHA in $REPO_PATH"
-
-  # Clone repo if missing
-  if [ ! -d "$REPO_PATH" ]; then
-    echo "[*] Path $REPO_PATH not found, cloning..."
-    git clone --depth=1 "$REMOTE_URL" "$REPO_PATH"
-  fi
-
+  echo -e "\n[*] $COMMIT_SHA -> $REPO_PATH"
+  [ -d "$REPO_PATH" ] || { echo "[!] $REPO_PATH doesn't exist"; exit 1; }
+  PATCH_FILE=$(mktemp)
+  curl -fsSL "$REMOTE_URL/commit/$COMMIT_SHA.patch" -o "$PATCH_FILE" || { echo "[!] download failed"; exit 1; }
   pushd "$REPO_PATH" > /dev/null
-
-  PATCH_URL="$REMOTE_URL/commit/$COMMIT_SHA.patch"
-
-  # Skip if already applied
-  if git log --oneline | grep -q "$COMMIT_SHA"; then
-    echo "[✔️] Skipping $COMMIT_SHA (already applied)."
-    popd > /dev/null
-    continue
-  fi
-
-  echo "[*] Downloading patch from $PATCH_URL"
-  if curl -fsSL "$PATCH_URL" | git am -3; then
-    echo "[✔️] Applied $COMMIT_SHA successfully."
-  else
-    echo "[!] Conflict detected for $COMMIT_SHA, aborting safely..."
-    git am --abort || true
-  fi
-
+  if git apply --check -R "$PATCH_FILE" 2>/dev/null; then echo "[✔] was applied"
+  elif git am -3 "$PATCH_FILE"; then echo "[✔] applied now"
+  else git am --abort || true; echo "[!!!] CONFLICT: $COMMIT_SHA"; fi
   popd > /dev/null
 done
-
-echo -e "All patches processed!"
 
 # ── export
 export BUILD_USERNAME=itis_sajjad
 export BUILD_HOSTNAME=crave
 
 # ── Build crDroid
-source build/envsetup.sh
+. build/envsetup.sh
 make installclean
-brunch ${DEVICE} userdebug
+lunch lineage_${DEVICE}-cp2a-userdebug
+mka bacon
