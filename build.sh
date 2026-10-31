@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # ── Config
-ROM_BRANCH="lineage-22.2"
+ROM_BRANCH="15.0"
 DEVICE="zahedan"
 MANIFEST_URL="https://github.com/LineageOS/android.git"
-LOCAL_MANIFEST_URL="https://github.com/sajjad85gh/local_manifests.git"
+LOCAL_MANIFEST_URL="https://github.com/crdroidandroid/android.git"
 
 # ── Clean
 rm -rf .repo/local_manifests
