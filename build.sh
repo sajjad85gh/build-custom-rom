@@ -3,8 +3,8 @@
 # ── Config
 ROM_BRANCH="15.0"
 DEVICE="zahedan"
-MANIFEST_URL="https://github.com/LineageOS/android.git"
-LOCAL_MANIFEST_URL="https://github.com/crdroidandroid/android.git"
+MANIFEST_URL="https://github.com/crdroidandroid/android.git"
+LOCAL_MANIFEST_URL="https://github.com/sajjad85gh/local_manifests.git"
 
 # ── Clean
 rm -rf .repo/local_manifests
