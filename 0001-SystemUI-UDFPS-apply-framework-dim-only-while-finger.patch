@@ -1,0 +1,367 @@
+From 7197c020753ab0936736493c29b32dc729ac3682 Mon Sep 17 00:00:00 2001
+From: Itis_Sajjad <itis_sajjad@example.com>
+Date: Tue, 3 Nov 2026 17:28:12 +0000
+Subject: [PATCH] SystemUI: UDFPS: apply framework dim below overlay only on
+ finger down
+
+1. Keep the UDFPS dim layer invisible and transparent (alpha=0) while idle
+   so the lockscreen and banking app prompts are not dimmed before touching
+   the sensor.
+2. Drop PRIVATE_FLAG_IS_ROUNDED_CORNERS_OVERLAY from dimLayoutParams and
+   attach the dim window inside addViewRunnable right before the UDFPS
+   touch overlay. Previously, PRIVATE_FLAG_IS_ROUNDED_CORNERS_OVERLAY
+   placed the black dim window in the topmost RoundedCornerOverlay
+   DisplayArea ABOVE UdfpsControllerOverlay and UdfpsSurfaceView, which
+   dimmed the white illumination dot itself and caused optical fingerprint
+   recognition to fail at low screen brightness.
+3. Title the dim window SurfaceView[UdfpsController (matching MediaTek HWC
+   FOD layer detection) and toggle its visibility only between onFingerDown
+   and onFingerUp/unconfigureDisplay, computing alpha from live brightness.
+---
+ .../systemui/biometrics/UdfpsController.java  |   8 +
+ .../biometrics/UdfpsControllerOverlay.kt      |  14 +-
+ .../systemui/biometrics/UdfpsHelper.kt        | 183 +++++++-----------
+ 3 files changed, 93 insertions(+), 112 deletions(-)
+
+diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
+index 83dd40a..eb15cfe 100644
+--- a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
++++ b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
+@@ -1016,6 +1016,9 @@ public class UdfpsController implements DozeReceiver, Dumpable {
+         if (!isOptical()) {
+             return;
+         }
++        if (mOverlay != null) {
++            mOverlay.onFingerUp();
++        }
+         UdfpsTouchOverlay udfpsView = (UdfpsTouchOverlay) view;
+         if (udfpsView.isDisplayConfigured()) {
+             udfpsView.unconfigureDisplay();
+@@ -1208,6 +1211,8 @@ public class UdfpsController implements DozeReceiver, Dumpable {
+             mDeviceEntryFaceAuthInteractor.onUdfpsSensorTouched();
+         }
+         mOnFingerDown = true;
++        // Apply the framework dim before the HAL enables HBM
++        mOverlay.onFingerDown();
+         mFingerprintManager.onPointerDown(requestId, mSensorProps.sensorId, pointerId, x, y,
+                 minor, major, orientation, time, gestureStart, isAod);
+         Trace.endAsyncSection("UdfpsController.e2e.onPointerDown", 0);
+@@ -1279,6 +1284,9 @@ public class UdfpsController implements DozeReceiver, Dumpable {
+         }
+         mOnFingerDown = false;
+         unconfigureDisplay(view);
++        if (mOverlay != null) {
++            mOverlay.onFingerUp();
++        }
+         cancelAodSendFingerUpAction();
+     }
+ 
+diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsControllerOverlay.kt b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsControllerOverlay.kt
+index bfd628b..c0f1b6a 100644
+--- a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsControllerOverlay.kt
++++ b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsControllerOverlay.kt
+@@ -148,7 +148,7 @@ constructor(
+     )
+ 
+     private val udfpsHelper: UdfpsHelper? = if (useFrameworkDimming) {
+-        UdfpsHelper(context, windowManager, shadeInteractor, requestReason)
++        UdfpsHelper(context, windowManager)
+     } else {
+         null
+     }
+@@ -262,10 +262,10 @@ constructor(
+     }
+ 
+     private fun addViewNowOrLater(view: View, animation: UdfpsAnimationViewController<*>?) {
+-        udfpsHelper?.addDimLayer()
+         addViewRunnable =
+             kotlinx.coroutines.Runnable {
+                 Trace.setCounter("UdfpsAddView", 1)
++                udfpsHelper?.addDimLayer()
+                 windowManager.addView(view, coreLayoutParams.updateDimensions(animation))
+             }
+         if (powerInteractor.detailedWakefulness.value.isAwake()) {
+@@ -331,6 +331,16 @@ constructor(
+         return wasShowing
+     }
+ 
++    /** The finger is on the sensor: apply the framework dim for the current brightness. */
++    fun onFingerDown() {
++        udfpsHelper?.onFingerDown()
++    }
++
++    /** The finger left the sensor: make the framework dim transparent again. */
++    fun onFingerUp() {
++        udfpsHelper?.onFingerUp()
++    }
++
+     /** Cancel this request. */
+     fun cancel() {
+         try {
+diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsHelper.kt b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsHelper.kt
+index 22140c7..3a20aa1 100644
+--- a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsHelper.kt
++++ b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsHelper.kt
+@@ -16,47 +16,46 @@
+ 
+ package com.android.systemui.biometrics
+ 
+-import android.animation.ValueAnimator
+ import android.annotation.UiThread
+ import android.content.Context
+ import android.graphics.Color
+ import android.graphics.PixelFormat
+-import android.hardware.biometrics.BiometricRequestConstants.REASON_AUTH_KEYGUARD
+-import android.hardware.biometrics.BiometricRequestConstants.RequestReason
+ import android.hardware.display.DisplayManager
++import android.os.Handler
++import android.os.Looper
+ import android.util.Log
+ import android.view.Display
+ import android.view.View
+ import android.view.WindowManager
+-import androidx.core.view.isVisible
+-import androidx.lifecycle.Lifecycle
+-import androidx.lifecycle.repeatOnLifecycle
+-import com.android.systemui.lifecycle.repeatWhenAttached
+-import com.android.systemui.shade.domain.interactor.ShadeInteractor
+-import kotlinx.coroutines.CoroutineScope
+-import kotlinx.coroutines.Job
+-import kotlinx.coroutines.launch
+ 
+ private const val TAG = "UdfpsHelper"
+ 
++private const val FRAME_DURATION_MS = 17L
++private const val DIM_REMOVE_DELAY_FRAMES = 2L
++
+ /**
+  * Facilitates implementations that use GHBM where dim layer
+- * and pressed icon aren't controlled by kernel
++ * and pressed icon aren't controlled by kernel.
++ *
++ * The dim window is attached right before the UDFPS overlay in the same
++ * TYPE_NAVIGATION_BAR_PANEL DisplayArea (without PRIVATE_FLAG_IS_ROUNDED_CORNERS_OVERLAY)
++ * so that its z-order stays strictly below UdfpsControllerOverlay and UdfpsSurfaceView.
++ * While idle, the view stays invisible and transparent; on finger down, its alpha is
++ * computed from the live panel brightness and it becomes visible only while illuminating.
+  */
+ @UiThread
+ class UdfpsHelper(
+     private val context: Context,
+     private val windowManager: WindowManager,
+-    private val shadeInteractor: ShadeInteractor,
+-    @RequestReason val requestReason: Int,
+     private var view: View = View(context).apply {
+         setBackgroundColor(Color.BLACK)
+-        visibility = View.GONE
++        visibility = View.INVISIBLE
+     }
+ ) {
+     private val displayManager = context.getSystemService(DisplayManager::class.java)!!
+-    private val isKeyguard = requestReason == REASON_AUTH_KEYGUARD
+-    private var newIsQsExpanded = false
++    private val handler = Handler(Looper.getMainLooper())
++    private var attached = false
++    private var dimActive = false
+ 
+     private val currentBrightness: Float get() =
+         displayManager.getBrightness(Display.DEFAULT_DISPLAY)
+@@ -77,45 +76,19 @@ class UdfpsHelper(
+         0 /* flags are set in computeLayoutParams() */,
+         PixelFormat.TRANSPARENT
+     ).apply {
+-        title = "Dim Layer for UDFPS"
++        title = "SurfaceView[UdfpsController"
+         fitInsetsTypes = 0
+         gravity = android.view.Gravity.TOP or android.view.Gravity.LEFT
+         layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+         flags = Utils.FINGERPRINT_OVERLAY_LAYOUT_PARAM_FLAGS or
+                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+         privateFlags = WindowManager.LayoutParams.PRIVATE_FLAG_TRUSTED_OVERLAY or
+-                WindowManager.LayoutParams.PRIVATE_FLAG_IS_ROUNDED_CORNERS_OVERLAY
++                WindowManager.LayoutParams.PRIVATE_FLAG_EXCLUDE_FROM_SCREEN_MAGNIFICATION
+         // Avoid announcing window title
+         accessibilityTitle = " "
+         inputFeatures = WindowManager.LayoutParams.INPUT_FEATURE_SPY
+     }
+ 
+-    private val alphaAnimator = ValueAnimator().apply {
+-        duration = 800L
+-        addUpdateListener { animator ->
+-            view.alpha = animator.animatedValue as Float
+-            dimLayoutParams.alpha = animator.animatedValue as Float
+-            try {
+-                windowManager.updateViewLayout(view, dimLayoutParams)
+-            } catch (e: IllegalArgumentException) {
+-                Log.e(TAG, "View not attached to WindowManager", e)
+-            }
+-        }
+-    }
+-
+-    private val displayListener = object : DisplayManager.DisplayListener {
+-        override fun onDisplayAdded(displayId: Int) {}
+-
+-        override fun onDisplayChanged(displayId: Int) {
+-            if (displayId == Display.DEFAULT_DISPLAY) {
+-                brightnessToAlpha()
+-                windowManager.updateViewLayout(view, dimLayoutParams)
+-            }
+-        }
+-
+-        override fun onDisplayRemoved(displayId: Int) {}
+-    }
+-
+     private fun interpolate(
+         value: Float,
+         fromMin: Int,
+@@ -134,20 +107,20 @@ class UdfpsHelper(
+         val (lowerBrightness, lowerAlpha) = lowerEntry
+         val (upperBrightness, upperAlpha) = upperEntry
+ 
+-        return interpolate(
+-            brightness.toFloat(),
+-            lowerBrightness,
+-            upperBrightness,
+-            lowerAlpha,
+-            upperAlpha
+-        ).div(255.0f)
++        return if (lowerBrightness == upperBrightness) {
++            lowerAlpha.div(255.0f)
++        } else {
++            interpolate(
++                brightness.toFloat(),
++                lowerBrightness,
++                upperBrightness,
++                lowerAlpha,
++                upperAlpha
++            ).div(255.0f)
++        }
+     }
+ 
+-    // The current function does not account for Doze state where the brightness can go lower
+-    // than what is set on config_screenBrightnessSettingMinimumFloat.
+-    // While it's possible to operate with floats, the dimming array was made by referencing
+-    // brightness_alpha_lut array from the kernel. This provides a comparable array.
+-    private fun brightnessToAlpha() {
++    private fun currentTargetAlpha(): Float {
+         val adjustedBrightness =
+             (currentBrightness.coerceIn(minBrightness, maxBrightness) * maxPanelBrightness).toInt()
+ 
+@@ -155,71 +128,61 @@ class UdfpsHelper(
+             ?: interpolateAlpha(adjustedBrightness)
+ 
+         Log.i(TAG, "Adjusted Brightness: $adjustedBrightness, Alpha: $targetAlpha")
++        return targetAlpha
++    }
+ 
+-        alphaAnimator.setFloatValues(view.alpha, targetAlpha)
+-        // Set the dim for both the view and the layout
+-        view.alpha = targetAlpha
+-        dimLayoutParams.alpha = targetAlpha
++    private val removeDimRunnable = Runnable {
++        setDimAlpha(0f, visible = false)
+     }
+ 
++    private fun setDimAlpha(alpha: Float, visible: Boolean) {
++        if (!attached) return
++        view.visibility = if (visible) View.VISIBLE else View.INVISIBLE
++        // Apply alpha to the window only so view.alpha and window.alpha do not multiply.
++        dimLayoutParams.alpha = alpha
++        try {
++            windowManager.updateViewLayout(view, dimLayoutParams)
++        } catch (e: IllegalArgumentException) {
++            Log.e(TAG, "View not attached to WindowManager", e)
++        }
++    }
++
++    /**
++     * Attach the (invisible, transparent) dim window right before the UDFPS overlay
++     * window is added so the dim window stays strictly below it in z-order.
++     */
+     fun addDimLayer() {
+-        brightnessToAlpha()
++        if (attached) return
++        dimLayoutParams.alpha = 0f
++        view.alpha = 1f
++        view.visibility = View.INVISIBLE
+         windowManager.addView(view, dimLayoutParams)
++        attached = true
+     }
+ 
+     fun removeDimLayer() {
++        handler.removeCallbacks(removeDimRunnable)
++        dimActive = false
++        if (!attached) return
++        attached = false
+         windowManager.removeView(view)
+     }
+ 
+-    init {
+-        view.repeatWhenAttached {
+-            repeatOnLifecycle(Lifecycle.State.CREATED) {
+-                listenForQsExpansion(this)
+-
+-                if (isKeyguard) {
+-                    listenForShadeTouchability(this)
+-                }
+-            }
+-        }
+-
+-        if (!isKeyguard) {
+-            view.isVisible = true
+-        }
++    /** Finger is on the sensor: apply the dim for the current panel brightness. */
++    fun onFingerDown() {
++        handler.removeCallbacks(removeDimRunnable)
++        dimActive = true
++        setDimAlpha(currentTargetAlpha(), visible = true)
+     }
+ 
+-    // We don't have ways to get temporary brightness when operating the brightness slider.
+-    // Therefore, the dim layer is hidden when the slider is expected to be utilized.
+-    private suspend fun listenForQsExpansion(scope: CoroutineScope): Job {
+-        return scope.launch {
+-            shadeInteractor.qsExpansion.collect { qsExpansion ->
+-                if (qsExpansion == 1f && !newIsQsExpanded) {
+-                    newIsQsExpanded = true
+-                    displayManager.registerDisplayListener(
+-                        displayListener,
+-                        null,
+-                        /* eventFlags */ 0,
+-                        DisplayManager.PRIVATE_EVENT_FLAG_DISPLAY_BRIGHTNESS,
+-                    )
+-                    view.isVisible = false
+-                } else if (qsExpansion == 0f && newIsQsExpanded) {
+-                    newIsQsExpanded = false
+-                    displayManager.unregisterDisplayListener(displayListener)
+-                    view.isVisible = true
+-                }
+-            }
+-        }
+-    }
+-
+-    private suspend fun listenForShadeTouchability(scope: CoroutineScope): Job {
+-        return scope.launch {
+-            shadeInteractor.isShadeTouchable.collect {
+-                view.isVisible = it
+-                if (view.isVisible) {
+-                    brightnessToAlpha()
+-                    alphaAnimator.cancel()
+-                    alphaAnimator.start()
+-                }
+-            }
+-        }
++    /**
++     * Finger left the sensor: make the dim layer transparent and invisible again.
++     * A short delay lets the panel leave HBM first, avoiding a brightness flash.
++     */
++    fun onFingerUp() {
++        if (!dimActive) return
++        dimActive = false
++        handler.removeCallbacks(removeDimRunnable)
++        handler.postDelayed(removeDimRunnable, DIM_REMOVE_DELAY_FRAMES * FRAME_DURATION_MS)
+     }
+ }
+-- 
+2.39.5
+
