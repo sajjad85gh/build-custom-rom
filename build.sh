@@ -47,7 +47,6 @@ wget -qO 873ce42cb45221b358c17aeebff6163fe8948e66.patch \
 git am 873ce42cb45221b358c17aeebff6163fe8948e66.patch || git am --abort
 rm -f 873ce42cb45221b358c17aeebff6163fe8948e66.patch
 
-git am --abort 2>/dev/null || true
 wget -qO 0001-SystemUI-UDFPS-apply-framework-dim-only-while-finger.patch \
   https://raw.githubusercontent.com/sajjad85gh/build-custom-rom/main/0001-SystemUI-UDFPS-apply-framework-dim-only-while-finger.patch
 git am 0001-SystemUI-UDFPS-apply-framework-dim-only-while-finger.patch || git am --abort

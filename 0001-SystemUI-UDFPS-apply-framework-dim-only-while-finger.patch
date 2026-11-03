@@ -1,11 +1,11 @@
-From 7197c020753ab0936736493c29b32dc729ac3682 Mon Sep 17 00:00:00 2001
+From 653cffd7eeb0d4511d0049f70ae295d7d8ef7dc7 Mon Sep 17 00:00:00 2001
 From: Itis_Sajjad <itis_sajjad@example.com>
-Date: Tue, 3 Nov 2026 17:28:12 +0000
+Date: Tue, 3 Nov 2026 17:45:10 +0000
 Subject: [PATCH] SystemUI: UDFPS: apply framework dim below overlay only on
  finger down
 
-1. Keep the UDFPS dim layer invisible and transparent (alpha=0) while idle
-   so the lockscreen and banking app prompts are not dimmed before touching
+1. Keep the UDFPS dim layer transparent (alpha=0) while idle so the
+   lockscreen and banking app prompts are not dimmed before touching
    the sensor.
 2. Drop PRIVATE_FLAG_IS_ROUNDED_CORNERS_OVERLAY from dimLayoutParams and
    attach the dim window inside addViewRunnable right before the UDFPS
@@ -14,14 +14,14 @@ Subject: [PATCH] SystemUI: UDFPS: apply framework dim below overlay only on
    DisplayArea ABOVE UdfpsControllerOverlay and UdfpsSurfaceView, which
    dimmed the white illumination dot itself and caused optical fingerprint
    recognition to fail at low screen brightness.
-3. Title the dim window SurfaceView[UdfpsController (matching MediaTek HWC
-   FOD layer detection) and toggle its visibility only between onFingerDown
-   and onFingerUp/unconfigureDisplay, computing alpha from live brightness.
+3. Also reset the dim layer inside unconfigureDisplay() when an acquire
+   event finishes illumination before the finger is lifted, and guard
+   against division by zero in interpolateAlpha().
 ---
  .../systemui/biometrics/UdfpsController.java  |   8 +
  .../biometrics/UdfpsControllerOverlay.kt      |  14 +-
- .../systemui/biometrics/UdfpsHelper.kt        | 183 +++++++-----------
- 3 files changed, 93 insertions(+), 112 deletions(-)
+ .../systemui/biometrics/UdfpsHelper.kt        | 176 +++++++-----------
+ 3 files changed, 88 insertions(+), 110 deletions(-)
 
 diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
 index 83dd40a..eb15cfe 100644
@@ -99,7 +99,7 @@ index bfd628b..c0f1b6a 100644
      fun cancel() {
          try {
 diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsHelper.kt b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsHelper.kt
-index 22140c7..3a20aa1 100644
+index 22140c7..36b4fb4 100644
 --- a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsHelper.kt
 +++ b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsHelper.kt
 @@ -16,47 +16,46 @@
@@ -142,8 +142,8 @@ index 22140c7..3a20aa1 100644
 + * The dim window is attached right before the UDFPS overlay in the same
 + * TYPE_NAVIGATION_BAR_PANEL DisplayArea (without PRIVATE_FLAG_IS_ROUNDED_CORNERS_OVERLAY)
 + * so that its z-order stays strictly below UdfpsControllerOverlay and UdfpsSurfaceView.
-+ * While idle, the view stays invisible and transparent; on finger down, its alpha is
-+ * computed from the live panel brightness and it becomes visible only while illuminating.
++ * While idle, the window stays fully transparent (alpha = 0f); on finger down, its alpha is
++ * computed from the live panel brightness and applied only while illuminating the sensor.
   */
  @UiThread
  class UdfpsHelper(
@@ -153,8 +153,7 @@ index 22140c7..3a20aa1 100644
 -    @RequestReason val requestReason: Int,
      private var view: View = View(context).apply {
          setBackgroundColor(Color.BLACK)
--        visibility = View.GONE
-+        visibility = View.INVISIBLE
+         visibility = View.GONE
      }
  ) {
      private val displayManager = context.getSystemService(DisplayManager::class.java)!!
@@ -166,15 +165,7 @@ index 22140c7..3a20aa1 100644
  
      private val currentBrightness: Float get() =
          displayManager.getBrightness(Display.DEFAULT_DISPLAY)
-@@ -77,45 +76,19 @@ class UdfpsHelper(
-         0 /* flags are set in computeLayoutParams() */,
-         PixelFormat.TRANSPARENT
-     ).apply {
--        title = "Dim Layer for UDFPS"
-+        title = "SurfaceView[UdfpsController"
-         fitInsetsTypes = 0
-         gravity = android.view.Gravity.TOP or android.view.Gravity.LEFT
-         layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+@@ -84,38 +83,12 @@ class UdfpsHelper(
          flags = Utils.FINGERPRINT_OVERLAY_LAYOUT_PARAM_FLAGS or
                  WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
          privateFlags = WindowManager.LayoutParams.PRIVATE_FLAG_TRUSTED_OVERLAY or
@@ -247,24 +238,21 @@ index 22140c7..3a20aa1 100644
          val adjustedBrightness =
              (currentBrightness.coerceIn(minBrightness, maxBrightness) * maxPanelBrightness).toInt()
  
-@@ -155,71 +128,61 @@ class UdfpsHelper(
+@@ -155,71 +128,58 @@ class UdfpsHelper(
              ?: interpolateAlpha(adjustedBrightness)
  
          Log.i(TAG, "Adjusted Brightness: $adjustedBrightness, Alpha: $targetAlpha")
 +        return targetAlpha
 +    }
++
++    private val removeDimRunnable = Runnable { setDimAlpha(0f) }
  
 -        alphaAnimator.setFloatValues(view.alpha, targetAlpha)
 -        // Set the dim for both the view and the layout
 -        view.alpha = targetAlpha
 -        dimLayoutParams.alpha = targetAlpha
-+    private val removeDimRunnable = Runnable {
-+        setDimAlpha(0f, visible = false)
-     }
- 
-+    private fun setDimAlpha(alpha: Float, visible: Boolean) {
++    private fun setDimAlpha(alpha: Float) {
 +        if (!attached) return
-+        view.visibility = if (visible) View.VISIBLE else View.INVISIBLE
 +        // Apply alpha to the window only so view.alpha and window.alpha do not multiply.
 +        dimLayoutParams.alpha = alpha
 +        try {
@@ -272,10 +260,10 @@ index 22140c7..3a20aa1 100644
 +        } catch (e: IllegalArgumentException) {
 +            Log.e(TAG, "View not attached to WindowManager", e)
 +        }
-+    }
-+
+     }
+ 
 +    /**
-+     * Attach the (invisible, transparent) dim window right before the UDFPS overlay
++     * Attach the (fully transparent) dim window right before the UDFPS overlay
 +     * window is added so the dim window stays strictly below it in z-order.
 +     */
      fun addDimLayer() {
@@ -283,7 +271,7 @@ index 22140c7..3a20aa1 100644
 +        if (attached) return
 +        dimLayoutParams.alpha = 0f
 +        view.alpha = 1f
-+        view.visibility = View.INVISIBLE
++        view.visibility = View.VISIBLE
          windowManager.addView(view, dimLayoutParams)
 +        attached = true
      }
@@ -314,7 +302,7 @@ index 22140c7..3a20aa1 100644
 +    fun onFingerDown() {
 +        handler.removeCallbacks(removeDimRunnable)
 +        dimActive = true
-+        setDimAlpha(currentTargetAlpha(), visible = true)
++        setDimAlpha(currentTargetAlpha())
      }
  
 -    // We don't have ways to get temporary brightness when operating the brightness slider.
@@ -352,7 +340,7 @@ index 22140c7..3a20aa1 100644
 -            }
 -        }
 +    /**
-+     * Finger left the sensor: make the dim layer transparent and invisible again.
++     * Finger left the sensor: make the dim layer transparent again.
 +     * A short delay lets the panel leave HBM first, avoiding a brightness flash.
 +     */
 +    fun onFingerUp() {
