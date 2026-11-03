@@ -1,5 +1,5 @@
 From 653cffd7eeb0d4511d0049f70ae295d7d8ef7dc7 Mon Sep 17 00:00:00 2001
-From: Itis_Sajjad <itis_sajjad@example.com>
+From: Itis_Sajjad <sajjad.ghaderi.1385@gmail.com>
 Date: Tue, 3 Nov 2026 17:45:10 +0000
 Subject: [PATCH] SystemUI: UDFPS: apply framework dim below overlay only on
  finger down
